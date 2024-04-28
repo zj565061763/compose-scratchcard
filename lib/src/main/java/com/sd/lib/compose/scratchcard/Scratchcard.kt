@@ -39,12 +39,14 @@ fun FScratchcard(
 ) {
     Box(modifier = modifier) {
         content()
-        ScratchcardBox(
-            modifier = Modifier.matchParentSize(),
-            state = state,
-            image = image,
-            thickness = thickness,
-        )
+        if (!state.cleared) {
+            ScratchcardBox(
+                modifier = Modifier.matchParentSize(),
+                state = state,
+                image = image,
+                thickness = thickness,
+            )
+        }
     }
 }
 
@@ -120,6 +122,10 @@ class FScratchcardState internal constructor() {
     internal var path by mutableStateOf(Path())
         private set
 
+    /** 是否已经清空图片 */
+    var cleared by mutableStateOf(false)
+        private set
+
     /** 当前触摸的位置 */
     var offset by mutableStateOf<Offset?>(null)
         private set
@@ -144,10 +150,18 @@ class FScratchcardState internal constructor() {
     }
 
     /**
-     * 重置
+     * 清空图片
+     */
+    fun clear() {
+        this.cleared = true
+    }
+
+    /**
+     * 重置图片
      */
     fun reset() {
         this.path.reset()
         this.offset = null
+        this.cleared = false
     }
 }

@@ -38,6 +38,9 @@ private fun ContentView(
 
     state.touchSpan(xSpanCount = 3, ySpanCount = 3) { row, column, touchCount ->
         logMsg { "($row,$column) $touchCount" }
+        if (touchCount == 5) {
+            state.clear()
+        }
     }
 
     Column(
@@ -46,6 +49,9 @@ private fun ContentView(
     ) {
         Button(onClick = { state.reset() }) {
             Text(text = "Reset")
+        }
+        Button(onClick = { state.clear() }) {
+            Text(text = "Clear")
         }
 
         FScratchcard(
