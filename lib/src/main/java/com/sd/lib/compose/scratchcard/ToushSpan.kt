@@ -5,11 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @SuppressLint("ComposableNaming")
@@ -31,19 +33,27 @@ fun FScratchcardState.touchSpan(
         }
     }
 
+    val coroutineScope = rememberCoroutineScope(getContext = { Dispatchers.IO })
+
     val offset = state.offset
     LaunchedEffect(touchHelper, offset) {
-        touchHelper.setOffset(offset)
+        coroutineScope.launch {
+            touchHelper.setOffset(offset)
+        }
     }
 
     val thickness = state.thickness
     LaunchedEffect(touchHelper, thickness) {
-        touchHelper.setThickness(thickness)
+        coroutineScope.launch {
+            touchHelper.setThickness(thickness)
+        }
     }
 
     state.boxSize?.let { boxSize ->
         LaunchedEffect(touchHelper, boxSize) {
-            touchHelper.setSize(boxSize.width, boxSize.height)
+            coroutineScope.launch {
+                touchHelper.setSize(boxSize.width, boxSize.height)
+            }
         }
     }
 }
