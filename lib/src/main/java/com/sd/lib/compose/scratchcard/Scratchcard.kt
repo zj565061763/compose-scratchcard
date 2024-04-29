@@ -3,6 +3,7 @@ package com.sd.lib.compose.scratchcard
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -16,7 +17,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -26,16 +26,17 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 
 @Composable
 fun FScratchcard(
-    image: ImageBitmap,
+    state: FScratchcardState,
     modifier: Modifier = Modifier,
-    state: FScratchcardState = rememberFScratchcardState(),
     thickness: Dp = 36.dp,
+    /** 覆盖层 */
+    overlay: @Composable BoxScope.() -> Unit,
+    /** 内容层 */
     content: @Composable () -> Unit,
 ) {
     Box(modifier = modifier) {
@@ -47,8 +48,8 @@ fun FScratchcard(
             ScratchcardBox(
                 modifier = Modifier.matchParentSize(),
                 state = state,
-                image = image,
                 thickness = thickness,
+                content = overlay,
             )
         }
     }
@@ -58,8 +59,8 @@ fun FScratchcard(
 private fun ScratchcardBox(
     modifier: Modifier = Modifier,
     state: FScratchcardState,
-    image: ImageBitmap,
     thickness: Dp,
+    content: @Composable BoxScope.() -> Unit,
 ) {
     val density = LocalDensity.current
     val thicknessPx by remember(density, thickness) {
@@ -91,13 +92,8 @@ private fun ScratchcardBox(
                 state.offset?.let { offset ->
                     state.path.lineTo(offset.x, offset.y)
                 }
-
                 onDrawWithContent {
-                    drawImage(
-                        image = image,
-                        dstSize = IntSize(size.width.toInt(), size.height.toInt()),
-                    )
-
+                    drawContent()
                     drawPath(
                         path = state.path,
                         color = Color.Black,
@@ -110,7 +106,9 @@ private fun ScratchcardBox(
                     )
                 }
             }
-    )
+    ) {
+        content()
+    }
 }
 
 @Composable

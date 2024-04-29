@@ -11,8 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import com.sd.demo.compose.scratchcard.theme.AppTheme
 import com.sd.lib.compose.scratchcard.FScratchcard
@@ -43,7 +41,7 @@ private fun ContentView(
 
     state.touchSpan(xSpanCount = 3, ySpanCount = 3) { row, column, touchCount ->
         logMsg { "($row,$column) $touchCount" }
-        if (touchCount >= 6) {
+        if (touchCount >= 9) {
             state.clear()
         }
     }
@@ -60,13 +58,20 @@ private fun ContentView(
         }
 
         FScratchcard(
-            image = ImageBitmap.imageResource(R.drawable.scratchcard_top_image),
             state = state,
-        ) {
-            Image(
-                painter = painterResource(R.drawable.scratchcard_bottom_image),
-                contentDescription = null,
-            )
-        }
+            overlay = {
+                Image(
+                    modifier = Modifier.matchParentSize(),
+                    painter = painterResource(R.drawable.scratchcard_top_image),
+                    contentDescription = null,
+                )
+            },
+            content = {
+                Image(
+                    painter = painterResource(R.drawable.scratchcard_bottom_image),
+                    contentDescription = null,
+                )
+            },
+        )
     }
 }
