@@ -75,7 +75,7 @@ private fun ScratchcardBox(
             .graphicsLayer {
                 compositingStrategy = CompositingStrategy.Offscreen
             }
-            .pointerInput(Unit) {
+            .pointerInput(state) {
                 detectDragGestures(
                     onDragStart = { offset ->
                         state.onDragStart(offset)
