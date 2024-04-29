@@ -47,7 +47,6 @@ fun FScratchcardState.touchSpan(
     touchHelper.setData(
         boxSize = state.boxSize,
         offset = state.offset,
-        thickness = state.thickness,
     )
 }
 
@@ -86,12 +85,10 @@ private abstract class TouchHelper(
     fun setData(
         boxSize: Size?,
         offset: Offset?,
-        thickness: Float?,
     ) {
         _dataFlow.value = TouchData(
             boxSize = boxSize,
             offset = offset,
-            thickness = thickness,
         )
     }
 
@@ -101,7 +98,6 @@ private abstract class TouchHelper(
         val height = boxSize.height.takeIf { it > 0 } ?: return
 
         val offset = data.offset ?: return
-        val thickness = data.thickness ?: return
 
         init()
         if (_spans.isEmpty()) return
@@ -117,15 +113,14 @@ private abstract class TouchHelper(
                 val bottomRight = topLeft + Offset(spanWidth, spanHeight)
 
                 val spanRect = Rect(topLeft = topLeft, bottomRight = bottomRight)
-                val touchRect = Rect(center = offset, radius = thickness / 2)
-
-                if (spanRect.overlaps(touchRect)) {
+                if (spanRect.contains(offset)) {
                     remove()
                     onTouchSpan(
                         row = row,
                         column = column,
                         touchCount = _totalSpanCount - _spans.size
                     )
+                    break
                 }
             }
         }
@@ -148,6 +143,5 @@ private abstract class TouchHelper(
     private data class TouchData(
         val boxSize: Size? = null,
         val offset: Offset? = null,
-        val thickness: Float? = null,
     )
 }

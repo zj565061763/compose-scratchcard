@@ -67,9 +67,7 @@ private fun ScratchcardBox(
     }
 
     var boxSize by remember { mutableStateOf<Size?>(null) }
-
     state.boxSize = boxSize
-    state.thickness = thicknessPx
 
     Box(
         modifier = modifier
@@ -140,10 +138,6 @@ class FScratchcardState internal constructor() {
 
     /** 容器大小 */
     var boxSize by mutableStateOf<Size?>(null)
-        internal set
-
-    /** 触摸点大小 */
-    var thickness by mutableStateOf<Float?>(null)
         internal set
 
     lateinit var onScratchStart: () -> Boolean
