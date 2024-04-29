@@ -2,17 +2,16 @@ package com.sd.lib.compose.scratchcard
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import androidx.compose.ui.geometry.Size
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @SuppressLint("ComposableNaming")
 @Composable
@@ -22,58 +21,44 @@ fun FScratchcardState.touchSpan(
     onTouchSpan: (row: Int, column: Int, touchCount: Int) -> Unit,
 ) {
     val state = this@touchSpan
-    val onTouchSpanUpdated by rememberUpdatedState(onTouchSpan)
 
-    val touchHelper = remember(xSpanCount, ySpanCount) {
+    val onTouchSpanUpdated by rememberUpdatedState(onTouchSpan)
+    val coroutineScope = rememberCoroutineScope()
+
+    val touchHelper = remember(xSpanCount, ySpanCount, coroutineScope) {
         state.reset()
-        object : TouchHelper(xSpanCount = xSpanCount, ySpanCount = ySpanCount) {
+        object : TouchHelper(
+            xSpanCount = xSpanCount,
+            ySpanCount = ySpanCount,
+            coroutineScope = coroutineScope,
+        ) {
             override fun onTouchSpan(row: Int, column: Int, touchCount: Int) {
                 onTouchSpanUpdated(row, column, touchCount)
             }
         }
     }
 
-    val coroutineScope = rememberCoroutineScope(getContext = { Dispatchers.IO })
-
-    val offset = state.offset
-    LaunchedEffect(touchHelper, offset) {
-        coroutineScope.launch {
-            touchHelper.setOffset(offset)
-        }
+    if (state.offset == null) {
+        touchHelper.reset()
     }
 
-    val thickness = state.thickness
-    LaunchedEffect(touchHelper, thickness) {
-        coroutineScope.launch {
-            touchHelper.setThickness(thickness)
-        }
-    }
-
-    state.boxSize?.let { boxSize ->
-        LaunchedEffect(touchHelper, boxSize) {
-            coroutineScope.launch {
-                touchHelper.setSize(boxSize.width, boxSize.height)
-            }
-        }
-    }
+    touchHelper.setData(
+        boxSize = state.boxSize,
+        offset = state.offset,
+        thickness = state.thickness,
+    )
 }
 
 private abstract class TouchHelper(
     private val xSpanCount: Int,
     private val ySpanCount: Int,
+    coroutineScope: CoroutineScope,
 ) {
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val _dispatcher = Dispatchers.Default.limitedParallelism(1)
     private val _totalSpanCount = xSpanCount * ySpanCount
+    private val _dataFlow = MutableStateFlow(TouchData())
 
     private var _init = false
     private val _spans = mutableListOf<Pair<Int, Int>>()
-
-    private var _width = 0f
-    private var _height = 0f
-
-    private var _offset: Offset? = null
-    private var _thickness: Float? = null
 
     init {
         require(xSpanCount > 0)
@@ -91,42 +76,30 @@ private abstract class TouchHelper(
         }
     }
 
-    private fun reset() {
+    fun reset() {
         _spans.clear()
         _init = false
     }
 
-    suspend fun setSize(width: Float, height: Float) {
-        withContext(_dispatcher) {
-            _width = width
-            _height = height
-            calculate()
-        }
+    fun setData(
+        boxSize: Size?,
+        offset: Offset?,
+        thickness: Float?,
+    ) {
+        _dataFlow.value = TouchData(
+            boxSize = boxSize,
+            offset = offset,
+            thickness = thickness,
+        )
     }
 
-    suspend fun setOffset(offset: Offset?) {
-        withContext(_dispatcher) {
-            if (_offset != null && offset == null) {
-                reset()
-            }
-            _offset = offset
-            calculate()
-        }
-    }
+    private fun calculate(data: TouchData) {
+        val boxSize = data.boxSize ?: return
+        val width = boxSize.width.takeIf { it > 0 } ?: return
+        val height = boxSize.height.takeIf { it > 0 } ?: return
 
-    suspend fun setThickness(thickness: Float?) {
-        withContext(_dispatcher) {
-            _thickness = thickness
-            calculate()
-        }
-    }
-
-    private suspend fun calculate() {
-        val width = _width.takeIf { it > 0 } ?: return
-        val height = _height.takeIf { it > 0 } ?: return
-
-        val offset = _offset ?: return
-        val thickness = _thickness ?: return
+        val offset = data.offset ?: return
+        val thickness = data.thickness ?: return
 
         init()
         if (_spans.isEmpty()) return
@@ -146,14 +119,20 @@ private abstract class TouchHelper(
 
                 if (spanRect.overlaps(touchRect)) {
                     remove()
-                    withContext(Dispatchers.Main) {
-                        onTouchSpan(
-                            row = row,
-                            column = column,
-                            touchCount = _totalSpanCount - _spans.size
-                        )
-                    }
+                    onTouchSpan(
+                        row = row,
+                        column = column,
+                        touchCount = _totalSpanCount - _spans.size
+                    )
                 }
+            }
+        }
+    }
+
+    init {
+        coroutineScope.launch {
+            _dataFlow.collect {
+                calculate(it)
             }
         }
     }
@@ -164,3 +143,9 @@ private abstract class TouchHelper(
         touchCount: Int,
     )
 }
+
+private data class TouchData(
+    val boxSize: Size? = null,
+    val offset: Offset? = null,
+    val thickness: Float? = null,
+)
