@@ -47,11 +47,11 @@ private fun ContentView(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Button(onClick = { state.reset() }) {
-            Text(text = "Reset")
-        }
         Button(onClick = { state.clear() }) {
             Text(text = "Clear")
+        }
+        Button(onClick = { state.reset() }) {
+            Text(text = "Reset")
         }
 
         FScratchcard(
