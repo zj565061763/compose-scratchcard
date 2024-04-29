@@ -68,8 +68,8 @@ private abstract class TouchHelper(
     private fun init() {
         if (!_init) {
             _init = true
-            for (row in 0..<xSpanCount) {
-                for (column in 0..<ySpanCount) {
+            for (row in 0..<ySpanCount) {
+                for (column in 0..<xSpanCount) {
                     _spans.add(row to column)
                 }
             }
