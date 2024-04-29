@@ -43,7 +43,7 @@ private fun ContentView(
 
     state.touchSpan(xSpanCount = 3, ySpanCount = 3) { row, column, touchCount ->
         logMsg { "($row,$column) $touchCount" }
-        if (touchCount >= 5) {
+        if (touchCount >= 6) {
             state.clear()
         }
     }
