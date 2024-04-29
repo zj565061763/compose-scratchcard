@@ -116,9 +116,13 @@ private fun ScratchcardBox(
 }
 
 @Composable
-fun rememberFScratchcardState(): FScratchcardState {
+fun rememberFScratchcardState(
+    onScratchStart: () -> Boolean = { true },
+): FScratchcardState {
     return remember {
         FScratchcardState()
+    }.also {
+        it.onScratchStart = onScratchStart
     }
 }
 
@@ -142,14 +146,22 @@ class FScratchcardState internal constructor() {
     var thickness by mutableStateOf<Float?>(null)
         internal set
 
+    lateinit var onScratchStart: () -> Boolean
+    private var _canDrag = false
+
     internal fun onDragStart(offset: Offset) {
-        this.path.moveTo(offset.x, offset.y)
-        this.offset = offset
+        _canDrag = onScratchStart()
+        if (_canDrag) {
+            this.path.moveTo(offset.x, offset.y)
+            this.offset = offset
+        }
     }
 
     internal fun onDrag(dragAmount: Offset) {
-        this.offset?.let { offset ->
-            this.offset = offset + dragAmount
+        if (_canDrag) {
+            this.offset?.let { offset ->
+                this.offset = offset + dragAmount
+            }
         }
     }
 

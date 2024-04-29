@@ -33,7 +33,9 @@ fun FScratchcardState.touchSpan(
             coroutineScope = coroutineScope,
         ) {
             override fun onTouchSpan(row: Int, column: Int, touchCount: Int) {
-                onTouchSpanUpdated(row, column, touchCount)
+                if (!state.cleared) {
+                    onTouchSpanUpdated(row, column, touchCount)
+                }
             }
         }
     }

@@ -34,11 +34,16 @@ class SampleScratchcard : ComponentActivity() {
 private fun ContentView(
     modifier: Modifier = Modifier,
 ) {
-    val state = rememberFScratchcardState()
+    val state = rememberFScratchcardState(
+        onScratchStart = {
+            logMsg { "onScratchStart" }
+            true
+        }
+    )
 
     state.touchSpan(xSpanCount = 3, ySpanCount = 3) { row, column, touchCount ->
         logMsg { "($row,$column) $touchCount" }
-        if (touchCount == 5) {
+        if (touchCount >= 5) {
             state.clear()
         }
     }
