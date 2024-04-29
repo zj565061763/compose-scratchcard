@@ -142,10 +142,10 @@ private abstract class TouchHelper(
         column: Int,
         touchCount: Int,
     )
-}
 
-private data class TouchData(
-    val boxSize: Size? = null,
-    val offset: Offset? = null,
-    val thickness: Float? = null,
-)
+    private data class TouchData(
+        val boxSize: Size? = null,
+        val offset: Offset? = null,
+        val thickness: Float? = null,
+    )
+}
