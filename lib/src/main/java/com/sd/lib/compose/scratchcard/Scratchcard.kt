@@ -1,5 +1,6 @@
 package com.sd.lib.compose.scratchcard
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -39,7 +40,10 @@ fun FScratchcard(
 ) {
     Box(modifier = modifier) {
         content()
-        if (!state.cleared) {
+        AnimatedVisibility(
+            visible = !state.cleared,
+            modifier = Modifier.matchParentSize(),
+        ) {
             ScratchcardBox(
                 modifier = Modifier.matchParentSize(),
                 state = state,
