@@ -40,10 +40,6 @@ fun FScratchcardState.touchSpan(
         }
     }
 
-    if (state.offset == null) {
-        touchHelper.reset()
-    }
-
     touchHelper.setData(
         boxSize = state.boxSize,
         offset = state.offset,
@@ -77,15 +73,21 @@ private abstract class TouchHelper(
         }
     }
 
-    fun reset() {
-        _spans.clear()
-        _init = false
+    private fun reset() {
+        if (_init) {
+            _init = false
+            _spans.clear()
+        }
     }
 
     fun setData(
         boxSize: Size?,
         offset: Offset?,
     ) {
+        if (offset == null) {
+            reset()
+        }
+
         _dataFlow.value = TouchData(
             boxSize = boxSize,
             offset = offset,
