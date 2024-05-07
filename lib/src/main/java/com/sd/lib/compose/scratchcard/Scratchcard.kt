@@ -126,7 +126,7 @@ class FScratchcardState internal constructor() {
     internal var path by mutableStateOf(Path())
         private set
 
-    /** 是否已经清空图片 */
+    /** 是否已经清空覆盖层 */
     var cleared by mutableStateOf(false)
         private set
 
@@ -138,7 +138,7 @@ class FScratchcardState internal constructor() {
     var boxSize by mutableStateOf<Size?>(null)
         internal set
 
-    lateinit var onScratchStart: () -> Boolean
+    internal lateinit var onScratchStart: () -> Boolean
     private var _canDrag = false
 
     internal fun onDragStart(offset: Offset) {
