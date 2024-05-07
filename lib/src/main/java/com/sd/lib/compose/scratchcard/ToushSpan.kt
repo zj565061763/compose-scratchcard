@@ -25,7 +25,7 @@ fun FScratchcardState.touchSpan(
     val onTouchSpanUpdated by rememberUpdatedState(onTouchSpan)
     val coroutineScope = rememberCoroutineScope()
 
-    val touchHelper = remember(xSpanCount, ySpanCount, coroutineScope) {
+    val touchHelper = remember(state, xSpanCount, ySpanCount, coroutineScope) {
         state.reset()
         object : TouchHelper(
             xSpanCount = xSpanCount,
