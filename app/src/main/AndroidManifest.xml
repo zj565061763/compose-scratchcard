@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SampleScratchcard" />
+        <activity android:name=".Sample" />
 
     </application>
 
