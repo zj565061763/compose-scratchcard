@@ -2,6 +2,8 @@
 
 # Sample
 
+![](Screenshots/sample.gif)
+
 ```kotlin
 @Composable
 private fun Sample() {
