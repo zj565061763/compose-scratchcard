@@ -45,10 +45,11 @@ class ScratchcardState internal constructor(
   var cleared by mutableStateOf(initialCleared)
     private set
 
+  internal val path = Path()
+
+  private val _offsetFlow = MutableStateFlow<Offset?>(null)
   internal var offset by mutableStateOf<Offset?>(null)
     private set
-
-  internal val path = Path()
 
   private val _forceRecomposeFlow = MutableStateFlow(false)
   internal var forceRecompose by mutableStateOf(false)
@@ -60,7 +61,6 @@ class ScratchcardState internal constructor(
   internal lateinit var graphicsLayer: GraphicsLayer
 
   private var _canDrag = false
-  private val _offsetFlow = MutableStateFlow<Offset?>(null)
   private var _calculateJob: Job? = null
 
   /** Clear the overlay */
