@@ -33,9 +33,7 @@ class Sample : ComponentActivity() {
 }
 
 @Composable
-private fun ContentView(
-  modifier: Modifier = Modifier,
-) {
+private fun ContentView(modifier: Modifier = Modifier) {
   val state = rememberScratchcardState(
     onScratchStart = {
       logMsg { "onScratchStart" }
@@ -57,7 +55,7 @@ private fun ContentView(
     ScratchcardBox(
       state = state,
       overlay = {
-        Box(modifier.background(Color.Gray))
+        Box(Modifier.background(Color.Gray))
       },
       content = {
         Image(
