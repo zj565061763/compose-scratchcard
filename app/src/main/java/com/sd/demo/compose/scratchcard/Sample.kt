@@ -46,18 +46,28 @@ private fun ContentView(modifier: Modifier = Modifier) {
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
-    Button(onClick = { state.clear() }) {
+    Button(onClick = {
+      // Clear the overlay
+      state.clear()
+    }) {
       Text(text = "Clear")
     }
-    Button(onClick = { state.reset() }) {
+
+    Button(onClick = {
+      // Reset and display the overlay
+      state.reset()
+    }) {
       Text(text = "Reset")
     }
+
     ScratchcardBox(
       state = state,
       overlay = {
+        // The overlay
         Box(Modifier.background(Color.Gray))
       },
       content = {
+        // The content
         Image(
           painter = painterResource(R.drawable.scratchcard_content),
           contentDescription = null,
