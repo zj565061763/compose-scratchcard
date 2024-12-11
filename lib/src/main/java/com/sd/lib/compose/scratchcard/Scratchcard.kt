@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
-import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -24,8 +23,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ScratchcardBox(
-  state: ScratchcardState,
   modifier: Modifier = Modifier,
+  state: ScratchcardState = rememberScratchcardState(),
   thickness: Dp = 36.dp,
   overlay: @Composable BoxScope.() -> Unit,
   content: @Composable BoxScope.() -> Unit,
@@ -57,40 +56,35 @@ fun Modifier.scratchcard(
     val density = LocalDensity.current
     val thicknessPx = remember(density, thickness) { with(density) { thickness.toPx() } }
 
-    val graphicsLayer = rememberGraphicsLayer()
-    state.graphicsLayer = graphicsLayer
-
-    if (state.forceRecompose) {
-      /**
-       * On some phones, after a long press,
-       * the offset change doesn't trigger a redraw, so a forced recomposition is required.
-       */
-      state.offset
+    /**
+     * On some phones, the offset change doesn't trigger a redraw,
+     * so a forced recomposition is required.
+     */
+    if (state.forceRecomposition) {
+      state.redraw
     }
 
     scratchcardGesture(state)
       .drawWithContent {
+        val graphicsLayer = state.graphicsLayer
         graphicsLayer.record { this@drawWithContent.drawContent() }
         drawLayer(graphicsLayer)
       }
-      .graphicsLayer {
-        compositingStrategy = CompositingStrategy.Offscreen
-      }
+      .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
       .drawWithContent {
-        drawContent()
+        state.redraw
         state.reportDraw()
-        state.offset?.also {
-          drawPath(
-            path = state.path,
-            color = Color.Black,
-            style = Stroke(
-              width = thicknessPx,
-              cap = StrokeCap.Round,
-              join = StrokeJoin.Round,
-            ),
-            blendMode = BlendMode.Clear,
-          )
-        }
+        drawContent()
+        drawPath(
+          path = state.path,
+          color = Color.Black,
+          style = Stroke(
+            width = thicknessPx,
+            cap = StrokeCap.Round,
+            join = StrokeJoin.Round,
+          ),
+          blendMode = BlendMode.Clear,
+        )
       }
   }
 }
