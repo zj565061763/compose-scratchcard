@@ -6,7 +6,7 @@ plugins {
 
 val libGroupId = "com.sd.lib.android"
 val libArtifactId = "compose-scratchcard"
-val libVersion = "1.0.0-beta01"
+val libVersion = "1.1.0-beta01"
 
 android {
   namespace = "com.sd.lib.compose.scratchcard"
