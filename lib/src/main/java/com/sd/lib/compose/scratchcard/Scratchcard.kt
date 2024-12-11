@@ -34,20 +34,35 @@ fun ScratchcardBox(
     propagateMinConstraints = true,
   ) {
     content()
-    Box(
-      modifier = Modifier
-        .matchParentSize()
-        .scratchcard(state, thickness),
-      propagateMinConstraints = true,
-    ) {
-      if (!state.cleared) {
-        overlay()
-      }
+    ScratchcardOverlay(
+      modifier = Modifier.matchParentSize(),
+      state = state,
+      thickness = thickness,
+      overlay = overlay,
+    )
+  }
+}
+
+@Composable
+fun ScratchcardOverlay(
+  modifier: Modifier = Modifier,
+  state: ScratchcardState = rememberScratchcardState(),
+  thickness: Dp = 36.dp,
+  overlay: @Composable BoxScope.() -> Unit,
+) {
+  Box(
+    modifier = modifier.scratchcard(state, thickness),
+    propagateMinConstraints = true,
+  ) {
+    if (state.cleared) {
+      // Show nothing
+    } else {
+      overlay()
     }
   }
 }
 
-fun Modifier.scratchcard(
+private fun Modifier.scratchcard(
   state: ScratchcardState,
   thickness: Dp = 36.dp,
 ): Modifier {
