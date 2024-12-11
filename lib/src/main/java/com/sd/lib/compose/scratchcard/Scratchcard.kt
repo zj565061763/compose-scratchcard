@@ -38,7 +38,7 @@ fun ScratchcardBox(
       modifier = Modifier.matchParentSize(),
       state = state,
       thickness = thickness,
-      overlay = overlay,
+      content = overlay,
     )
   }
 }
@@ -48,16 +48,16 @@ fun ScratchcardOverlay(
   modifier: Modifier = Modifier,
   state: ScratchcardState = rememberScratchcardState(),
   thickness: Dp = 36.dp,
-  overlay: @Composable BoxScope.() -> Unit,
+  content: @Composable BoxScope.() -> Unit,
 ) {
   Box(
     modifier = modifier.scratchcard(state, thickness),
     propagateMinConstraints = true,
   ) {
     if (state.cleared) {
-      // Show nothing
+      // Nothing
     } else {
-      overlay()
+      content()
     }
   }
 }
